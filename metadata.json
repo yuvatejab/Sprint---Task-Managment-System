@@ -1,0 +1,6 @@
+{
+  "name": "Task Management Application",
+  "description": "A highly refined full-stack Task Management Board with premium board/list modes, activity tracers, and attachments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

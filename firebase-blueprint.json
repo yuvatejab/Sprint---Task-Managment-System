@@ -1,0 +1,100 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered application user with credentials and roles",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique user ID generated on registration"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user"
+        },
+        "passwordHash": {
+          "type": "string",
+          "description": "Bcrypt hashed password"
+        },
+        "role": {
+          "type": "string",
+          "description": "User role: 'user' or 'admin'"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the user account was created"
+        }
+      },
+      "required": ["uid", "email", "passwordHash", "role", "createdAt"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Task item owned by a user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique task ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the owner of this task"
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Email of the owner for display or administrator auditing"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the task"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed notes or description of the task"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["todo", "in-progress", "completed"],
+          "description": "Current status of the task"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "description": "Importance level of the task"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Expected completion deadline"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the task was initially created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the task was last edited"
+        },
+        "activities": {
+          "type": "array",
+          "description": "List of dynamic edit history events for this task"
+        }
+      },
+      "required": ["id", "userId", "userEmail", "title", "status", "priority", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stored credentials and user specific profiles"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Task board cards managed by users"
+    }
+  }
+}
