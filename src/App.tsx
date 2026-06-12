@@ -4,10 +4,11 @@ import {
   Plus, Search, ListFilter, SlidersHorizontal, LogOut, 
   LayoutGrid, List, ChevronLeft, ChevronRight, RefreshCw, 
   ShieldAlert, Sparkles, CheckSquare, Layers, Clock, ShieldCheck, HelpCircle,
-  Download
+  Download, Shield
 } from 'lucide-react';
 
 import AuthCard from './components/AuthCard';
+import AdminManager from './components/AdminManager';
 import ThemeToggle from './components/ThemeToggle';
 import StatsGrid from './components/StatsGrid';
 import TaskBoard from './components/TaskBoard';
@@ -32,6 +33,9 @@ export default function App() {
   const [user, setUser] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  // View mode switcher: 'tasks' default or 'admin'
+  const [viewMode, setViewMode] = useState<'tasks' | 'admin'>('tasks');
 
   // Task lists and pagination
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -156,6 +160,7 @@ export default function App() {
     setUser(null);
     setToken(null);
     setTasks([]);
+    setViewMode('tasks');
     localStorage.removeItem('auth_user');
     localStorage.removeItem('auth_token');
   };
@@ -531,6 +536,21 @@ export default function App() {
               )}
             </div>
 
+            {user.role === 'admin' && (
+              <button
+                id="admin-deck-toggle-trigger"
+                onClick={() => setViewMode(viewMode === 'admin' ? 'tasks' : 'admin')}
+                className={`p-1.5 px-3 rounded-2xl text-xs font-semibold flex items-center gap-1.5 border transition-all duration-200 cursor-pointer select-none ${
+                  viewMode === 'admin'
+                    ? 'bg-amber-500/15 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/20 shadow-[0_1px_8px_rgba(245,158,11,0.15)]'
+                    : 'bg-white/50 dark:bg-zinc-900/60 hover:bg-neutral-100 dark:hover:bg-zinc-850 text-neutral-600 dark:text-zinc-300 border-neutral-200/40 dark:border-zinc-800/55 shadow-xs'
+                }`}
+              >
+                <Shield className="w-3.5 h-3.5 text-amber-500" />
+                <span>{viewMode === 'admin' ? 'Tasks Board' : 'Overseer Deck'}</span>
+              </button>
+            )}
+
             <ThemeToggle />
 
             <button
@@ -548,8 +568,11 @@ export default function App() {
 
       {/* Main Content Dashboard Layout */}
       <main className="max-w-7xl mx-auto px-6 mt-8">
-        
-        {/* Floating Admin Banner Warnings */}
+        {viewMode === 'admin' && user.role === 'admin' ? (
+          <AdminManager token={token} currentUser={user} onBackToBoard={() => setViewMode('tasks')} />
+        ) : (
+          <>
+            {/* Floating Admin Banner Warnings */}
         {user.role === 'admin' && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.99 }}
@@ -809,6 +832,8 @@ export default function App() {
               </div>
             )}
           </div>
+        )}
+          </>
         )}
       </main>
 

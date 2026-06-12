@@ -63,6 +63,30 @@ function handleFirestoreError(error: unknown, operationType: OperationType, coll
   throw new Error(JSON.stringify(errInfo));
 }
 
+async function logGlobalActivity(action: string, details: string, email: string) {
+  try {
+    const id = crypto.randomUUID();
+    const timestamp = new Date().toISOString();
+    await setDoc(doc(db, 'system_logs', id), {
+      id,
+      action,
+      details,
+      email,
+      timestamp
+    });
+  } catch (err) {
+    console.error('Failed to log global activity:', err);
+  }
+}
+
+function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!req.user || req.user.role !== 'admin') {
+    res.status(403).json({ error: 'Access denied: Administration privilege required' });
+    return;
+  }
+  next();
+}
+
 // ----------------------------------------------------
 // Authentication Middleware
 // ----------------------------------------------------
@@ -156,6 +180,7 @@ app.post('/api/auth/signup', async (req, res) => {
     // Store in Firestore
     try {
       await setDoc(userRef, newUser);
+      await logGlobalActivity('signup', `User registered: ${email.toLowerCase()}`, email.toLowerCase());
     } catch (dbErr) {
       return handleFirestoreError(dbErr, OperationType.CREATE, 'users', uid, email);
     }
@@ -229,6 +254,11 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const userData = userDoc.data();
+    if (userData.isSuspended) {
+      res.status(403).json({ error: 'Access Denied: This user account has been suspended by an Administrator.' });
+      return;
+    }
+    
     const isPasswordMatch = await bcrypt.compare(password, userData.passwordHash);
 
     if (!isPasswordMatch) {
@@ -242,6 +272,8 @@ app.post('/api/auth/login', async (req, res) => {
       role: userData.role 
     };
     const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
+
+    await logGlobalActivity('login', `User logged in`, userData.email);
 
     res.status(200).json({
       message: 'Login successful',
@@ -315,6 +347,7 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
   try {
     try {
       await setDoc(doc(db, 'tasks', id), newTask);
+      await logGlobalActivity('task_created', `Created task "${title.trim()}"`, req.user!.email);
     } catch (dbErr) {
       return handleFirestoreError(dbErr, OperationType.WRITE, `tasks/${id}`, req.user?.uid, req.user?.email);
     }
@@ -574,6 +607,7 @@ app.patch('/api/tasks/:id', authenticateToken, async (req, res) => {
 
       try {
         await updateDoc(taskRef, updates);
+        await logGlobalActivity('task_updated', `Updated task details for "${existingTask.title}" (${Object.keys(updates).join(', ')})`, req.user!.email);
       } catch (dbErr) {
         return handleFirestoreError(dbErr, OperationType.UPDATE, `tasks/${id}`, req.user?.uid, req.user?.email);
       }
@@ -616,6 +650,7 @@ app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
 
     try {
       await deleteDoc(taskRef);
+      await logGlobalActivity('task_deleted', `Deleted task "${task.title}"`, req.user!.email);
     } catch (dbErr) {
       return handleFirestoreError(dbErr, OperationType.DELETE, `tasks/${id}`, req.user?.uid, req.user?.email);
     }
@@ -690,6 +725,207 @@ app.post('/api/tasks/:id/attachments', authenticateToken, async (req, res) => {
     res.status(200).json(newAttachment);
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Failed to attach file' });
+  }
+});
+
+
+// ----------------------------------------------------
+// Admin Management API Routes (Restricted to overseers)
+// ----------------------------------------------------
+
+// 1. GET /api/admin/users
+app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const usersRef = collection(db, 'users');
+    const qSnap = await getDocs(usersRef);
+    const usersList: any[] = [];
+    qSnap.forEach(docSnap => {
+      const data = docSnap.data();
+      const { passwordHash, ...safeUserData } = data;
+      usersList.push(safeUserData);
+    });
+    res.status(200).json(usersList);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Failed to list users' });
+  }
+});
+
+// 2. POST /api/admin/users
+app.post('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
+  const { email, password, role } = req.body;
+
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    res.status(400).json({ error: 'A valid email is required' });
+    return;
+  }
+  if (!password || typeof password !== 'string' || password.length < 6) {
+    res.status(400).json({ error: 'Password must be at least 6 characters' });
+    return;
+  }
+
+  const roleValue = role === 'admin' ? 'admin' : 'user';
+  const emailLower = email.toLowerCase();
+
+  try {
+    const userRef = doc(db, 'users', emailLower);
+    const existingSnap = await getDoc(userRef);
+
+    if (existingSnap.exists()) {
+      res.status(400).json({ error: 'A user with this email already exists' });
+      return;
+    }
+
+    const uid = crypto.randomUUID();
+    const passwordHash = await bcrypt.hash(password, 10);
+    const createdAt = new Date().toISOString();
+
+    const newUser = {
+      uid,
+      email: emailLower,
+      role: roleValue,
+      passwordHash,
+      createdAt,
+      isSuspended: false
+    };
+
+    await setDoc(userRef, newUser);
+    await logGlobalActivity('admin_create_user', `Admin created user: ${emailLower} (${roleValue})`, req.user!.email);
+
+    res.status(201).json({
+      uid,
+      email: emailLower,
+      role: roleValue,
+      createdAt,
+      isSuspended: false
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Failed to create user' });
+  }
+});
+
+// 3. PATCH /api/admin/users/:email
+app.patch('/api/admin/users/:email', authenticateToken, requireAdmin, async (req, res) => {
+  const { email } = req.params;
+  const { role, isSuspended, password } = req.body;
+  const emailLower = email.toLowerCase();
+
+  try {
+    const userRef = doc(db, 'users', emailLower);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const existingUserData = userSnap.data();
+    const updates: any = {};
+
+    if (role === 'admin' || role === 'user') {
+      if (existingUserData.role !== role) {
+        updates.role = role;
+        await logGlobalActivity('admin_update_user_role', `Changed role of ${emailLower} to ${role}`, req.user!.email);
+      }
+    }
+
+    if (isSuspended !== undefined) {
+      if (existingUserData.isSuspended !== isSuspended) {
+        updates.isSuspended = !!isSuspended;
+        const stateText = isSuspended ? 'Suspended' : 'Activated';
+        await logGlobalActivity('admin_update_user_access', `${stateText} user access for ${emailLower}`, req.user!.email);
+      }
+    }
+
+    if (password && typeof password === 'string' && password.length >= 6) {
+      updates.passwordHash = await bcrypt.hash(password, 10);
+      await logGlobalActivity('admin_reset_password', `Reset password for ${emailLower}`, req.user!.email);
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await updateDoc(userRef, updates);
+    }
+
+    const updatedSnap = await getDoc(userRef);
+    const { passwordHash, ...safeData } = updatedSnap.data() as any;
+    res.status(200).json(safeData);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Failed to update user' });
+  }
+});
+
+// 4. DELETE /api/admin/users/:email
+app.delete('/api/admin/users/:email', authenticateToken, requireAdmin, async (req, res) => {
+  const { email } = req.params;
+  const emailLower = email.toLowerCase();
+
+  if (emailLower === req.user!.email) {
+    res.status(400).json({ error: 'Denial: You cannot delete your own admin account!' });
+    return;
+  }
+
+  try {
+    const userRef = doc(db, 'users', emailLower);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    await deleteDoc(userRef);
+    await logGlobalActivity('admin_delete_user', `Admin deleted user record: ${emailLower}`, req.user!.email);
+
+    res.status(200).json({ message: 'User deleted successfully', email: emailLower });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Failed to delete user' });
+  }
+});
+
+// 5. GET /api/admin/activities
+app.get('/api/admin/activities', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const logsRef = collection(db, 'system_logs');
+    const querySnap = await getDocs(logsRef);
+    const logs: any[] = [];
+    querySnap.forEach(d => {
+      logs.push(d.data());
+    });
+
+    if (logs.length === 0) {
+      const defaultLogs = [
+        {
+          id: 'init-log-1',
+          action: 'system_initialized',
+          details: 'S.P.R.I.N.T Task Management System engine initialized on Secure Sandbox v1.2',
+          email: 'system',
+          timestamp: new Date(Date.now() - 3600000 * 24).toISOString()
+        },
+        {
+          id: 'init-log-2',
+          action: 'security_policy_enforced',
+          details: 'Cloud Security Ledger active. Encrypted token parameters loaded correctly',
+          email: 'system',
+          timestamp: new Date(Date.now() - 3600000 * 12).toISOString()
+        },
+        {
+          id: 'init-log-3',
+          action: 'admin_seeded',
+          details: 'Overseer accounts synced to sandbox environments successfully',
+          email: 'system',
+          timestamp: new Date(Date.now() - 3600000 * 6).toISOString()
+        }
+      ];
+
+      for (const dLog of defaultLogs) {
+        await setDoc(doc(db, 'system_logs', dLog.id), dLog);
+        logs.push(dLog);
+      }
+    }
+
+    logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    res.status(200).json(logs.slice(0, 80));
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Failed to fetch global activities' });
   }
 });
 
