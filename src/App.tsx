@@ -471,10 +471,10 @@ export default function App() {
               <Layers className="w-5 h-5 stroke-[1.5]" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans">
-              Objective Taskboard
+              S.P.R.I.N.T
             </h1>
             <p className="text-neutral-400 dark:text-zinc-500 text-[10px] tracking-wider mt-2.5 uppercase font-mono">
-              Enterprise Secure Workspace Environment
+              Task managment System
             </p>
           </div>
 
@@ -502,13 +502,13 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm font-semibold tracking-tight text-neutral-900 dark:text-white flex items-center gap-1.5 leading-none">
-                Objective Taskboard
+                S.P.R.I.N.T
                 <span className="text-[10px] font-mono bg-neutral-100/80 dark:bg-zinc-900 text-neutral-500 dark:text-zinc-400 px-2 py-0.5 rounded-full font-bold">
                   v1.2
                 </span>
               </h1>
               <p className="text-[9px] text-neutral-400 dark:text-zinc-550 tracking-wider mt-1.5 uppercase font-mono">
-                SECURE CLOUD CONTROL PANEL
+                Task managment System
               </p>
             </div>
           </div>

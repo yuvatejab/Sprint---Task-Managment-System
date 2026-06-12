@@ -190,7 +190,32 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
-    const userRef = doc(db, 'users', email.toLowerCase());
+    const emailLower = email.toLowerCase();
+    const userRef = doc(db, 'users', emailLower);
+    
+    // Auto-create/seed requested demo credentials if they do not exist
+    if (emailLower === 'user@gmail.com' || emailLower === 'admin@gmail.com') {
+      try {
+        const checkDoc = await getDoc(userRef);
+        if (!checkDoc.exists()) {
+          const uid = emailLower === 'admin@gmail.com' ? 'sandbox-admin-uid-999' : 'sandbox-user-uid-111';
+          const userRole = emailLower === 'admin@gmail.com' ? 'admin' : 'user';
+          const defaultPassword = emailLower === 'admin@gmail.com' ? 'admin@123' : 'user@123';
+          const passwordHash = await bcrypt.hash(defaultPassword, 10);
+          await setDoc(userRef, {
+            uid,
+            email: emailLower,
+            role: userRole,
+            passwordHash,
+            createdAt: new Date().toISOString()
+          });
+        }
+      } catch (seedErr) {
+        console.error('Error auto-seeding demo credentials:', seedErr);
+        // Continue and let the regular query flow throw standard error if database is down
+      }
+    }
+
     let userDoc;
     try {
       userDoc = await getDoc(userRef);

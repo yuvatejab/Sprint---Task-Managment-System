@@ -456,40 +456,111 @@ export default function TaskModal({ isOpen, onClose, task, onSave, token }: Task
                 className="space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400 col-span-2">Comprehensive Change Ledger</h4>
-                  <div className="text-[10px] bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> Audit Compliant
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-zinc-500">Comprehensive Change Ledger</h4>
+                  <div className="text-[10px] bg-emerald-100/70 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 font-mono">
+                    <Clock className="w-3 h-3" /> Audit Trail Active
                   </div>
                 </div>
 
-                <div className="relative border-l-2 border-gray-100 dark:border-gray-800 pl-5 ml-2.5 space-y-6 max-h-[40vh] overflow-y-auto pr-2" id="audit-logs-timeline">
+                <div 
+                  className="relative py-2 pl-4 ml-2.5 space-y-6 max-h-[42vh] overflow-y-auto pr-2 border-l border-neutral-200/40 dark:border-zinc-800/65" 
+                  id="audit-logs-timeline"
+                >
                   {activities.length === 0 ? (
-                    <div className="text-sm text-gray-400 dark:text-gray-500 py-2">No logs found.</div>
+                    <div className="text-xs text-neutral-450 dark:text-zinc-500 py-4 text-center">No structural timeline logs logged.</div>
                   ) : (
-                    activities.map((log, index) => (
-                      <div key={log.id || index} className="relative">
-                        {/* Timeline node */}
-                        <div className="absolute -left-[27px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-gray-900 bg-emerald-500 shadow-sm" />
-                        
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold font-mono text-gray-800 dark:text-gray-200">
-                              {log.action.replace('_', ' ').toUpperCase()}
-                            </span>
-                            <span className="text-[10px] text-gray-400 font-mono">•</span>
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-450 font-medium">
-                              {log.userEmail}
-                            </span>
+                    activities.map((log, index) => {
+                      const normalizedAction = (log.action || '').toLowerCase();
+                      const detailsLower = (log.details || '').toLowerCase();
+
+                      let icon = <Clock className="w-3 h-3" />;
+                      let bgClass = 'bg-neutral-100 dark:bg-zinc-900';
+                      let textClass = 'text-neutral-500 dark:text-zinc-400';
+                      let borderClass = 'border-neutral-200 dark:border-zinc-800';
+                      let badgeText = 'Event';
+
+                      if (normalizedAction === 'created') {
+                        icon = <Plus className="w-3 h-3" />;
+                        bgClass = 'bg-emerald-50 dark:bg-emerald-950/45';
+                        textClass = 'text-emerald-500 dark:text-emerald-400';
+                        borderClass = 'border-emerald-200 dark:border-emerald-800/50';
+                        badgeText = 'Created';
+                      } else if (normalizedAction === 'status_updated') {
+                        badgeText = 'Status Update';
+                        if (detailsLower.includes('completed')) {
+                          icon = <CheckCircle className="w-3 h-3" />;
+                          bgClass = 'bg-emerald-50 dark:bg-emerald-950/45';
+                          textClass = 'text-emerald-500 dark:text-emerald-400';
+                          borderClass = 'border-emerald-200 dark:border-emerald-800/50';
+                        } else if (detailsLower.includes('in-progress') || detailsLower.includes('in progress')) {
+                          icon = <Clock className="w-3 h-3" />;
+                          bgClass = 'bg-amber-50 dark:bg-amber-950/40';
+                          textClass = 'text-amber-500 dark:text-amber-400';
+                          borderClass = 'border-amber-200 dark:border-amber-850/50';
+                        } else {
+                          icon = <ListTodo className="w-3 h-3" />;
+                          bgClass = 'bg-blue-50 dark:bg-blue-950/40';
+                          textClass = 'text-blue-500 dark:text-blue-400';
+                          borderClass = 'border-blue-200 dark:border-blue-800/50';
+                        }
+                      } else if (normalizedAction === 'priority_updated') {
+                        icon = <AlertTriangle className="w-3 h-3" />;
+                        bgClass = 'bg-rose-50 dark:bg-rose-955/40';
+                        textClass = 'text-rose-500 dark:text-rose-450';
+                        borderClass = 'border-rose-200 dark:border-rose-900/40';
+                        badgeText = 'Priority';
+                      } else if (normalizedAction === 'duedate_updated') {
+                        icon = <Calendar className="w-3 h-3" />;
+                        bgClass = 'bg-indigo-50 dark:bg-indigo-950/40';
+                        textClass = 'text-indigo-500 dark:text-indigo-400';
+                        borderClass = 'border-indigo-200 dark:border-indigo-800/40';
+                        badgeText = 'Schedule';
+                      } else if (normalizedAction === 'attachment_added' || normalizedAction === 'attachments_updated') {
+                        icon = <Paperclip className="w-3 h-3" />;
+                        bgClass = 'bg-teal-50 dark:bg-teal-950/30';
+                        textClass = 'text-teal-555 dark:text-teal-400';
+                        borderClass = 'border-teal-200 dark:border-teal-800/40';
+                        badgeText = 'Attachment';
+                      } else if (normalizedAction === 'title_updated' || normalizedAction === 'description_updated') {
+                        icon = <FileText className="w-3 h-3" />;
+                        bgClass = 'bg-violet-50 dark:bg-violet-950/35';
+                        textClass = 'text-violet-555 dark:text-violet-400';
+                        borderClass = 'border-violet-200 dark:border-violet-800/45';
+                        badgeText = 'Content';
+                      }
+
+                      return (
+                        <div key={log.id || index} className="relative pl-6 pb-2.5 last:pb-0">
+                          {/* Circle Badge Over the Solid Vertical Line */}
+                          <div className={`absolute -left-[27px] top-0.5 w-5 h-5 rounded-full flex items-center justify-center border ${borderClass} ${bgClass} ${textClass} shadow-xs z-10`} style={{ left: '-26.5px' }}>
+                            {icon}
                           </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {log.details}
-                          </p>
-                          <p className="text-[10px] text-gray-400 font-mono mt-1">
-                            {new Date(log.timestamp).toLocaleString()}
-                          </p>
+                          
+                          <div className="flex flex-col gap-1 -mt-0.5">
+                            {/* Meta & Timestamp Header Row */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-[9px] font-bold font-mono px-2 py-0.5 rounded-md uppercase tracking-wider bg-neutral-100 dark:bg-zinc-900 border border-neutral-200/30 dark:border-zinc-800/40 text-neutral-500 dark:text-zinc-450 scale-[0.95] origin-left">
+                                {badgeText}
+                              </span>
+                              <span className="text-[9px] text-neutral-400 dark:text-zinc-550 font-mono">
+                                {new Date(log.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                              </span>
+                            </div>
+                            
+                            {/* Core Log Narrative Details */}
+                            <p className="text-xs font-medium text-neutral-800 dark:text-neutral-200 leading-normal pl-0.5">
+                              {log.details}
+                            </p>
+                            
+                            {/* Author tag */}
+                            <div className="text-[10px] text-neutral-400 dark:text-zinc-550 pl-0.5 flex items-center gap-1">
+                              <span>By:</span>
+                              <span className="font-semibold text-neutral-600 dark:text-zinc-400">{log.userEmail}</span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </motion.div>

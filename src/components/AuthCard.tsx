@@ -235,11 +235,47 @@ export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-[10px] text-neutral-400 dark:text-zinc-500 leading-normal">
-          <span>Enterprise Secure Sync. Admins manage and view all user schedules.</span>
-          <div className="mt-1.5 p-1 px-2.5 inline-block bg-neutral-100/65 dark:bg-zinc-900/60 rounded-xl border border-neutral-200/10 dark:border-zinc-800/10">
-            Default sandbox admin: <span className="font-semibold text-neutral-700 dark:text-zinc-300">ybandharapu@gmail.com</span>
+        {isLogin && (
+          <div className="mt-6 pt-5 border-t border-neutral-200/25 dark:border-zinc-900/40">
+            <p className="text-[10px] font-semibold text-neutral-400 dark:text-zinc-500 mb-3 text-center uppercase tracking-wider font-sans">
+              Sandbox Quick Access
+            </p>
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('user@gmail.com');
+                  setPassword('user@123');
+                }}
+                className="flex flex-col items-start p-3 text-left bg-neutral-100/40 dark:bg-zinc-900/40 border border-neutral-200/40 dark:border-zinc-800/50 rounded-2xl hover:border-blue-500/50 dark:hover:border-blue-400/50 transition-all duration-300 group cursor-pointer"
+              >
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <UserPlus className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-xs font-semibold text-neutral-800 dark:text-white">Contributor</span>
+                </div>
+                <span className="text-[10px] text-neutral-400 dark:text-zinc-500 truncate w-full">user@gmail.com</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('admin@gmail.com');
+                  setPassword('admin@123');
+                }}
+                className="flex flex-col items-start p-3 text-left bg-neutral-100/40 dark:bg-zinc-900/40 border border-neutral-200/40 dark:border-zinc-800/50 rounded-2xl hover:border-emerald-500/50 dark:hover:border-emerald-400/50 transition-all duration-300 group cursor-pointer"
+              >
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="text-xs font-semibold text-neutral-800 dark:text-white">Admin Mode</span>
+                </div>
+                <span className="text-[10px] text-neutral-400 dark:text-zinc-500 truncate w-full">admin@gmail.com</span>
+              </button>
+            </div>
           </div>
+        )}
+
+        <div className="mt-6 text-center text-[10px] text-neutral-400 dark:text-zinc-500 leading-normal">
+          <span>Enterprise Secure Sync. Admins manage and view all user schedules.</span>
         </div>
       </motion.div>
     </div>
