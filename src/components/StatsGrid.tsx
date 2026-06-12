@@ -42,7 +42,7 @@ export default function StatsGrid({ tasks }: StatsGridProps) {
       {/* KPI Card 1: Total */}
       <motion.div
         variants={cardVariants}
-        className="p-5 backdrop-blur-md bg-white/60 dark:bg-zinc-900/40 border border-white/50 dark:border-zinc-800/45 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300"
+        className="p-5 apple-glass glass-hover rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
       >
         <div className="flex items-center justify-between mb-3.5">
           <div className="p-2 rounded-2xl bg-neutral-100/80 dark:bg-zinc-800/60 text-neutral-500 dark:text-zinc-400">
@@ -57,7 +57,7 @@ export default function StatsGrid({ tasks }: StatsGridProps) {
       {/* KPI Card 2: In Progress */}
       <motion.div
         variants={cardVariants}
-        className="p-5 backdrop-blur-md bg-white/60 dark:bg-zinc-900/40 border border-white/50 dark:border-zinc-800/45 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300"
+        className="p-5 apple-glass glass-hover rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
       >
         <div className="flex items-center justify-between mb-3.5">
           <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
@@ -72,13 +72,13 @@ export default function StatsGrid({ tasks }: StatsGridProps) {
       {/* KPI Card 3: High Priority Urgent */}
       <motion.div
         variants={cardVariants}
-        className="p-5 backdrop-blur-md bg-white/60 dark:bg-zinc-900/40 border border-white/50 dark:border-zinc-800/45 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300"
+        className="p-5 apple-glass glass-hover rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
       >
         <div className="flex items-center justify-between mb-3.5">
           <div className="p-2 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400">
             <Flame className="w-4 h-4 stroke-[1.5]" />
           </div>
-          <span className="text-[9px] font-bold tracking-widest text-rose-600 dark:text-rose-450 uppercase font-sans">CRITICAL</span>
+          <span className="text-[9px] font-bold tracking-widest text-rose-600 dark:text-rose-455 uppercase font-sans">CRITICAL</span>
         </div>
         <p className="text-xs font-medium text-neutral-455 dark:text-zinc-450">High Priority</p>
         <p className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-white mt-1 font-sans">{highPriorityCount}</p>
@@ -87,10 +87,10 @@ export default function StatsGrid({ tasks }: StatsGridProps) {
       {/* KPI Card 4: Overdue Alert */}
       <motion.div
         variants={cardVariants}
-        className={`p-5 backdrop-blur-md bg-white/60 dark:bg-zinc-900/40 border rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300 ${
+        className={`p-5 apple-glass glass-hover rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.02)] ${
           overdueCount > 0 
             ? 'border-red-500/30' 
-            : 'border-white/50 dark:border-zinc-800/45'
+            : ''
         }`}
       >
         <div className="flex items-center justify-between mb-3.5">
@@ -107,14 +107,14 @@ export default function StatsGrid({ tasks }: StatsGridProps) {
         </div>
         <p className="text-xs font-medium text-neutral-455 dark:text-zinc-450">Past Due Date</p>
         <p className={`text-3xl font-semibold tracking-tight mt-1 font-sans ${
-          overdueCount > 0 ? 'text-red-650 dark:text-red-400' : 'text-neutral-900 dark:text-white'
+          overdueCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-white'
         }`}>{overdueCount}</p>
       </motion.div>
 
       {/* KPI Card 5: Progress completion bar */}
       <motion.div
         variants={cardVariants}
-        className="p-5 backdrop-blur-md bg-white/60 dark:bg-zinc-900/40 border border-white/50 dark:border-zinc-800/45 rounded-3xl col-span-2 lg:col-span-1 shadow-[0_8px_32px_0_rgba(0,0,0,0.03)] hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300"
+        className="p-5 apple-glass glass-hover rounded-3xl col-span-2 lg:col-span-1 shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
       >
         <div className="flex items-center justify-between mb-2.5">
           <div className="p-2 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">

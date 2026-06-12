@@ -48,7 +48,7 @@ export default function TaskList({ tasks, onEditTask, onDeleteTask, onToggleComp
   }
 
   return (
-    <div className="backdrop-blur-md bg-white/70 dark:bg-zinc-950/30 border border-neutral-200/45 dark:border-zinc-800/40 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.02)] overflow-hidden" id="task-list-table-container">
+    <div className="apple-glass rounded-3xl shadow-[0_12px_40px_-5px_rgba(0,0,0,0.03)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.2)] overflow-hidden" id="task-list-table-container">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>

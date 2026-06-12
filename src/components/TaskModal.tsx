@@ -174,7 +174,7 @@ export default function TaskModal({ isOpen, onClose, task, onSave, token }: Task
           damping: 28,
           mass: 0.95
         }}
-        className="relative w-full max-w-2xl bg-white/95 dark:bg-zinc-950/90 border border-neutral-200/40 dark:border-zinc-800/40 rounded-3xl shadow-[0_24px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_50px_rgba(0,0,0,0.5)] overflow-hidden max-h-[90vh] flex flex-col"
+        className="relative w-full max-w-2xl apple-glass rounded-3xl shadow-[0_24px_50px_rgba(0,0,0,0.06)] dark:shadow-[0_24px_50px_rgba(0,0,0,0.4)] overflow-hidden max-h-[90vh] flex flex-col"
       >
         {/* Header */}
         <div className="p-6 border-b border-neutral-200/25 dark:border-zinc-900/35 flex items-center justify-between">

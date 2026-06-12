@@ -22,9 +22,9 @@ export default function TaskBoard({
   onUpdateTaskStatus
 }: TaskBoardProps) {
   const columns: { id: TaskStatus; title: string; labelColor: string; bgClass: string }[] = [
-    { id: 'todo', title: 'To Do', labelColor: 'bg-blue-500', bgClass: 'bg-neutral-100/30 dark:bg-zinc-950/15' },
-    { id: 'in-progress', title: 'In Progress', labelColor: 'bg-amber-500', bgClass: 'bg-neutral-100/30 dark:bg-zinc-950/15' },
-    { id: 'completed', title: 'Completed', labelColor: 'bg-emerald-500', bgClass: 'bg-neutral-100/30 dark:bg-zinc-950/15' }
+    { id: 'todo', title: 'To Do', labelColor: 'bg-blue-500', bgClass: 'bg-white/15 dark:bg-white/2 backdrop-blur-md' },
+    { id: 'in-progress', title: 'In Progress', labelColor: 'bg-amber-500', bgClass: 'bg-white/15 dark:bg-white/2 backdrop-blur-md' },
+    { id: 'completed', title: 'Completed', labelColor: 'bg-emerald-500', bgClass: 'bg-white/15 dark:bg-white/2 backdrop-blur-md' }
   ];
 
   const getPriorityStyle = (priority: string) => {
@@ -66,7 +66,7 @@ export default function TaskBoard({
             <DroppableColumn 
               key={column.id}
               id={column.id}
-              className={`flex flex-col rounded-3xl border border-neutral-200/45 dark:border-zinc-800/40 p-4.5 min-h-[550px] ${column.bgClass}`}
+              className={`flex flex-col rounded-3xl border border-neutral-200/20 dark:border-white/5 p-4.5 min-h-[550px] ${column.bgClass}`}
             >
               {/* Column Header */}
               <div className="flex items-center justify-between mb-4.5 pb-2.5 border-b border-neutral-200/25 dark:border-zinc-850">

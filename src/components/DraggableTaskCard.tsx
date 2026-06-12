@@ -41,7 +41,7 @@ export default function DraggableTaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group backdrop-blur-md bg-white/80 dark:bg-zinc-900/60 border border-neutral-200/50 dark:border-zinc-800/60 rounded-2xl p-4.5 shadow-[0_4px_20px_-3px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_25px_-4px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_12px_25px_-4px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 transition-all duration-300 relative select-none ${
+      className={`group apple-glass glass-hover rounded-2xl p-4.5 shadow-[0_4px_20px_-3px_rgba(0,0,0,0.02)] relative select-none ${
         isDragging ? 'ring-1.5 ring-blue-500/70 shadow-xl scale-[1.01]' : ''
       }`}
       id={`draggable-task-card-${task.id}`}

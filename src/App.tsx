@@ -15,6 +15,18 @@ import TaskList from './components/TaskList';
 import TaskModal from './components/TaskModal';
 import { Task, TaskStatus, TaskPriority } from './types';
 
+const GlassBackground = () => (
+  <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
+    {/* Ambient gradient circles */}
+    <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/8 dark:bg-blue-600/4 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+    <div className="absolute bottom-[20%] left-[25%] w-[35%] h-[35%] rounded-full bg-emerald-500/6 dark:bg-emerald-600/3 blur-[130px] animate-pulse" style={{ animationDuration: '12s' }} />
+    <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] rounded-full bg-indigo-500/8 dark:bg-indigo-600/4 blur-[150px] animate-pulse" style={{ animationDuration: '10s' }} />
+    <div className="absolute top-[30%] right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/6 dark:bg-purple-600/3 blur-[130px] animate-pulse" style={{ animationDuration: '11s' }} />
+    {/* Subtle grid pattern background overlay if wanted */}
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808005_1px,transparent_1px)] bg-[size:16px_28px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)]" />
+  </div>
+);
+
 export default function App() {
   // Authentication states
   const [user, setUser] = useState<any>(null);
@@ -439,7 +451,8 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-[#09090b] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-6 text-center relative">
+        <GlassBackground />
         <span className="w-8 h-8 border-2 border-neutral-300 dark:border-zinc-805 border-t-neutral-800 dark:border-t-white rounded-full animate-spin mb-4" />
         <h4 className="text-xs font-medium text-neutral-500 dark:text-zinc-400 font-sans tracking-tight">Syncing secure parameters...</h4>
       </div>
@@ -449,17 +462,18 @@ export default function App() {
   // Not authenticated? Show the Authentication Login screen
   if (!user || !token) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-[#09090b] transition-colors duration-300 py-16 px-4">
+      <div className="min-h-screen bg-transparent transition-colors duration-300 py-16 px-4 relative">
+        <GlassBackground />
         <div className="max-w-7xl mx-auto flex flex-col items-center justify-center">
           {/* Header */}
           <div className="mb-8 text-center flex flex-col items-center">
-            <div className="p-3.5 bg-neutral-100/80 dark:bg-zinc-900/60 border border-neutral-200/20 dark:border-zinc-850 text-neutral-850 dark:text-neutral-100 rounded-2xl shadow-sm mb-4">
-              <Layers className="w-6 h-6 stroke-[1.5]" />
+            <div className="p-3 bg-neutral-100/70 dark:bg-zinc-900/60 border border-neutral-200/20 dark:border-zinc-800/20 text-neutral-800 dark:text-neutral-100 rounded-3xl shadow-sm mb-4">
+              <Layers className="w-5 h-5 stroke-[1.5]" />
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight text-neutral-950 dark:text-white font-sans">
+            <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-sans">
               Objective Taskboard
             </h1>
-            <p className="text-neutral-400 dark:text-zinc-550 text-xs tracking-wider mt-2.5 uppercase font-mono">
+            <p className="text-neutral-400 dark:text-zinc-500 text-[10px] tracking-wider mt-2.5 uppercase font-mono">
               Enterprise Secure Workspace Environment
             </p>
           </div>
@@ -475,9 +489,10 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-[#09090b] text-neutral-900 dark:text-neutral-100 transition-colors duration-300 pb-16">
+    <div className="min-h-screen bg-transparent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 pb-16 relative">
+      <GlassBackground />
       {/* Top Navigation Panel bar */}
-      <nav className="sticky top-0 z-40 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl border-b border-neutral-200/25 dark:border-zinc-900/35 px-6 py-4">
+      <nav className="sticky top-0 z-40 bg-white/40 dark:bg-zinc-950/40 backdrop-blur-2xl border-b border-neutral-200/20 dark:border-white/5 px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           
           {/* App title logo */}
@@ -564,7 +579,7 @@ export default function App() {
         <StatsGrid tasks={tasks} />
 
         {/* Filters, layout modes, Search panel bar */}
-        <div className="backdrop-blur-md bg-white/60 dark:bg-zinc-950/20 border border-neutral-200/45 dark:border-zinc-800/40 rounded-3xl p-5 mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.02)]">
+        <div className="apple-glass rounded-3xl p-5 mb-6 shadow-[0_12px_40px_-5px_rgba(0,0,0,0.03)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.2)]">
           <div className="flex flex-col xl:flex-row gap-4 items-center justify-between">
             
             {/* Search tasks by title */}
