@@ -22,9 +22,14 @@ import {
 const app = express();
 const PORT = 3000;
 
-// Resolve __dirname and __filename in ES Module context
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Resolve path coordinates safely in both ESM and CJS contexts
+const resolvedFilename = typeof import.meta !== 'undefined' && import.meta.url 
+  ? fileURLToPath(import.meta.url) 
+  : (typeof __filename !== 'undefined' ? __filename : '');
+
+const resolvedDirname = typeof import.meta !== 'undefined' && import.meta.url 
+  ? path.dirname(resolvedFilename) 
+  : (typeof __dirname !== 'undefined' ? __dirname : '');
 
 app.use(express.json({ limit: '10mb' })); // support file attachments/base64
 
